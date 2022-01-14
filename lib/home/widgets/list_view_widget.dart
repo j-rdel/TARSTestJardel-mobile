@@ -1,0 +1,127 @@
+import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
+
+class ListViewWidget extends StatelessWidget {
+  final int id;
+  final String name;
+  final int age;
+  final String career;
+  final String photoURL;
+
+  const ListViewWidget({
+    Key? key,
+    required this.id,
+    required this.name,
+    required this.age,
+    required this.career,
+    required this.photoURL,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 70,
+      decoration: BoxDecoration(
+        color: Colors.grey.shade100,
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 6.0,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          children: [
+            Container(
+              width: 50,
+              height: 50,
+              child: CircleAvatar(
+                radius: 50,
+                backgroundImage: NetworkImage(photoURL),
+              ),
+            ),
+            Expanded(
+              flex: 1,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('${name} - ${age} years old'),
+                          Text('${career}'),
+                        ],
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        IconButton(
+                          onPressed: () {},
+                          icon: Icon(Icons.edit),
+                          color: Colors.greenAccent,
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            showDialog(
+                                context: context,
+                                builder: (BuildContext context) => AlertDialog(
+                                      title: Text(
+                                          "Do you want delete this person?"),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () =>
+                                              Navigator.pop(context),
+                                          child: Text(
+                                            "No",
+                                          ),
+                                        ),
+                                        TextButton(
+                                          onPressed: () async {
+                                            await deletePeople(id);
+                                            Navigator.pop(context);
+                                          },
+                                          child: Text(
+                                            "Yes",
+                                          ),
+                                        ),
+                                      ],
+                                    ));
+                          },
+                          icon: Icon(Icons.delete),
+                          color: Colors.redAccent,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<bool?> deletePeople(int id) async {
+    Response response;
+    Dio dio = new Dio();
+    var url = "http://127.0.0.1:5001/peoples/${id}";
+    try {
+      response = await dio.delete(url);
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        return false;
+      }
+    } on DioError catch (err) {
+      print(err);
+    }
+  }
+}

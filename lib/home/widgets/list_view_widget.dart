@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:tarstest/update_person/update_person_page.dart';
@@ -10,7 +12,7 @@ class ListViewWidget extends StatelessWidget {
   final String career;
   final String photoURL;
 
-  const ListViewWidget({
+  ListViewWidget({
     Key? key,
     required this.id,
     required this.name,
@@ -93,7 +95,18 @@ class ListViewWidget extends StatelessWidget {
                                         ),
                                         TextButton(
                                           onPressed: () async {
-                                            await deletePeople(id);
+                                            var response =
+                                                await deletePerson(id);
+
+                                            if (response == true) {
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                      snackBarSuccess);
+                                            } else {
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(snackBarError);
+                                            }
+
                                             Navigator.pop(context);
                                           },
                                           child: Text(
@@ -118,7 +131,15 @@ class ListViewWidget extends StatelessWidget {
     );
   }
 
-  Future<bool?> deletePeople(int id) async {
+  final snackBarSuccess = SnackBar(
+      content: Text("Person deleted successfully", textAlign: TextAlign.center),
+      backgroundColor: Colors.greenAccent);
+
+  final snackBarError = SnackBar(
+      content: Text("Failed to delete a person", textAlign: TextAlign.center),
+      backgroundColor: Colors.redAccent);
+
+  Future<bool?> deletePerson(int id) async {
     Response response;
     Dio dio = new Dio();
     try {

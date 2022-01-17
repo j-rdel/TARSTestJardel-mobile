@@ -40,7 +40,7 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       Expanded(
                         child: Text(
-                          "Good morning, Jardel Urban!",
+                          "Hello, here is my test",
                           style: TextStyle(color: Colors.white),
                         ),
                       ),

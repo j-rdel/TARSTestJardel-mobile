@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:tarstest/update_person/update_person_page.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ListViewWidget extends StatelessWidget {
   final int id;
@@ -63,7 +65,14 @@ class ListViewWidget extends StatelessWidget {
                     Row(
                       children: [
                         IconButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => UpdatePersonPage(
+                                          id: id,
+                                        )));
+                          },
                           icon: Icon(Icons.edit),
                           color: Colors.greenAccent,
                         ),
@@ -112,9 +121,8 @@ class ListViewWidget extends StatelessWidget {
   Future<bool?> deletePeople(int id) async {
     Response response;
     Dio dio = new Dio();
-    var url = "http://127.0.0.1:5001/peoples/${id}";
     try {
-      response = await dio.delete(url);
+      response = await dio.delete("${dotenv.env["URL"]}/person/${id}");
       if (response.statusCode == 200) {
         return true;
       } else {

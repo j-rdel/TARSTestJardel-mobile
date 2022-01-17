@@ -1,9 +1,11 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:tarstest/core/app_colors.dart';
-import 'package:tarstest/home/models/people_model.dart';
+import 'package:tarstest/create_person/create_person_page.dart';
+import 'package:tarstest/shared/models/person_model.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:tarstest/home/widgets/list_view_widget.dart';
+import 'package:tarstest/shared/widgets/button_widget.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -13,11 +15,11 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late Future<List<PeopleModel>?> futureListPeople;
+  late Future<List<PersonModel>?> futureListPersons;
 
   @override
   void initState() {
-    futureListPeople = fetchListPeople();
+    futureListPersons = fetchListPersons();
     super.initState();
   }
 
@@ -42,31 +44,23 @@ class _HomePageState extends State<HomePage> {
                           style: TextStyle(color: Colors.white),
                         ),
                       ),
-                      ElevatedButton(
-                        onPressed: () {},
-                        child: Text(
-                          "Add person",
-                          style: TextStyle(color: Colors.black),
-                        ),
-                        style: ButtonStyle(
-                            elevation: MaterialStateProperty.all<double>(5.0),
-                            shape: MaterialStateProperty.all<OutlinedBorder>(
-                                RoundedRectangleBorder(
-                                    borderRadius:
-                                        BorderRadius.circular(30.00))),
-                            backgroundColor:
-                                MaterialStateProperty.all<Color>(Colors.white),
-                            padding:
-                                MaterialStateProperty.all<EdgeInsetsGeometry>(
-                                    EdgeInsets.all(15))),
-                      )
+                      ButtonWidget(
+                          onPressed: () {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => CreatePersonPage(),
+                              ),
+                            );
+                          },
+                          text: "Add person")
                     ],
                   ),
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.only(top: 20),
-                      child: FutureBuilder<List<PeopleModel>?>(
-                        future: futureListPeople,
+                      child: FutureBuilder<List<PersonModel>?>(
+                        future: futureListPersons,
                         builder: (context, snapshot) {
                           if (snapshot.hasData && snapshot.data!.isEmpty) {
                             return Text("Vazio");
@@ -104,18 +98,19 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Future<List<PeopleModel>?> fetchListPeople() async {
+  Future<List<PersonModel>?> fetchListPersons() async {
     Response response;
     Dio dio = new Dio();
+
     try {
-      response = await dio.get("http://127.0.0.1:5001/peoples");
+      response = await dio.get("${dotenv.env["URL"]}/person");
 
       if (response.statusCode == 200) {
-        var listPeople = (response.data as List).map((item) {
-          return PeopleModel.fromJson(item);
+        var listPersons = (response.data as List).map((item) {
+          return PersonModel.fromJson(item);
         }).toList();
 
-        return listPeople;
+        return listPersons;
       } else {
         throw Exception('Failed to load list of peoples');
       }
